@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo de Series Infantiles</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #f0f8ff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        h1 {
+            color: #ff6b6b;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+        .bingo-card {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .bingo-cell {
+            background-color: #fff;
+            border: 3px solid #4ecdc4;
+            border-radius: 10px;
+            padding: 20px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .bingo-cell.marked {
+            background-color: #ffd166;
+            transform: scale(0.95);
+        }
+        .controls {
+            margin-top: 30px;
+        }
+        button {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin: 0 10px;
+        }
+        button:hover {
+            background-color: #ff5252;
+            transform: scale(1.05);
+        }
+        .winner-message {
+            font-size: 24px;
+            margin-top: 20px;
+            color: #ff6b6b;
+            font-weight: bold;
+            display: none;
+            animation: bounce 0.5s infinite alternate;
+        }
+        @keyframes bounce {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+        /* Eliminado el estilo para card-id */
+    </style>
+</head>
+<body>
+    <h1>¡Bingo de Series Infantiles!</h1>
+    <div class="bingo-card" id="bingoCard"></div>
+    <div class="winner-message" id="winnerMessage">¡BINGO! ¡HAS GANADO!</div>
+    <div class="controls">
+        <button id="newCardBtn">Nueva Tarjeta</button>
+        <button id="resetBtn">Reiniciar Selección</button>
+    </div>
+    
+    <audio id="winSound" preload="auto">
+        <source src="data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA/+NAwAAAAAAAAAAAAFhpbmcAAAAPAAAAAwAABPEAYmJiYmJiYmJiYmJiYmJiYmJiYmJigoKCgoKCgoKCgoKCgoKCgoKCgoKCn5+fn5+fn5+fn5+fn5+fn5+fn5+fn8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz8/Pz///////////////////////////////////////////////AAAAAExhdmM1OC4xMwAAAAAAAAAAAAAAACQDaAAAAAAAAATxV9YZeQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/+MQxAAZOHoFvEeMAFSYEAEAnhIhmNFHIMmEQD4wzIMjELgaJBwuCKxsM0iYSAUbJrHAwmYIgYOhYehNBgLGwaGAMGO//5hjv////4Yb//qGBf/wwT//DAsFgoBAMCwUAwUP/qGGAYFgEDgGCgCBYKAIFAECgAAACAIAgCAIBgEAQDAADgOA4DgBAULAQLBQDAMFAMCgGPAwCAgBAUOA9/gwMBATBwCXEVJ6mrSiNnLhgDpjJu8XrJwYHAIME4rRfAKIIJgWDKjg3A6AE3HRoC2JDYlgXDBlBYfG6YCg0TcGAVJ2b15EYJBoGAGUkGFVTEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/jEMRbIZLGEANPGcAAAA0gAAABFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" type="audio/mpeg">
+    </audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const categories = [
+                "Phineas and Ferb",
+                "Dora la Exploradora",
+                "Backyardigans",
+                "Los Padrinos Mágicos",
+                "LazyTown",
+                "Caillou",
+                "Manny a la Obra",
+                "Bob Esponja",
+                "VelozMente",
+                "Wow! Wow! Wubbzy!"
+            ];
+            
+            const bingoCard = document.getElementById('bingoCard');
+            const winnerMessage = document.getElementById('winnerMessage');
+            const winSound = document.getElementById('winSound');
+            const newCardBtn = document.getElementById('newCardBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            
+            // Generar un ID único para cada tarjeta
+            function generateCardId() {
+                return Math.random().toString(36).substr(2, 9);
+            }
+            
+            // Mezclar array de forma aleatoria (algoritmo Fisher-Yates)
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+            
+            // Crear una nueva tarjeta de bingo
+            function createNewCard() {
+                // Detener el sonido si está sonando
+                stopWinSound();
+                
+                bingoCard.innerHTML = '';
+                winnerMessage.style.display = 'none';
+                
+                // Mezclar categorías y tomar las primeras 4
+                const shuffledCategories = shuffleArray([...categories]);
+                const selectedCategories = shuffledCategories.slice(0, 4);
+                
+                // Crear celdas
+                selectedCategories.forEach(category => {
+                    const cell = document.createElement('div');
+                    cell.className = 'bingo-cell';
+                    cell.textContent = category;
+                    cell.addEventListener('click', function() {
+                        toggleMark(cell);
+                        checkBingo();
+                    });
+                    bingoCard.appendChild(cell);
+                });
+                
+                // Ya no generamos ni mostramos ID de tarjeta
+            }
+            
+            // Marcar/desmarcar celda
+            function toggleMark(cell) {
+                // Solo añadir la clase, sin posibilidad de desmarcar
+                if (!cell.classList.contains('marked')) {
+                    cell.classList.add('marked');
+                }
+            }
+            
+            // Comprobar si hay bingo (todas las celdas marcadas)
+            function checkBingo() {
+                const cells = document.querySelectorAll('.bingo-cell');
+                const allMarked = Array.from(cells).every(cell => cell.classList.contains('marked'));
+                
+                if (allMarked) {
+                    winnerMessage.style.display = 'block';
+                    playWinSound();
+                }
+            }
+            
+            // Variables globales para el sonido
+            let oscillator = null;
+            let audioContext = null;
+            let alarmInterval = null;
+
+            // Reproducir sonido al ganar
+            function playWinSound() {
+                // Si ya hay un sonido reproduciendo, no hacer nada
+                if (oscillator !== null) return;
+                
+                // Crear un contexto de audio
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioContext = new AudioContext();
+                
+                // Función para crear un tono
+                function createTone(frequency) {
+                    // Detener el oscilador anterior si existe
+                    if (oscillator !== null) {
+                        oscillator.stop();
+                        oscillator = null;
+                    }
+                    
+                    // Crear un nuevo oscilador
+                    oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    // Configurar el sonido
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+                    gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+                    
+                    // Iniciar el oscilador
+                    oscillator.start();
+                }
+                
+                // Secuencia de tonos para el patrón de alarma
+                const tones = [880, 1760, 1175]; // Frecuencias de los tonos
+                let toneIndex = 0;
+                
+                // Crear el primer tono
+                createTone(tones[0]);
+                
+                // Cambiar de tono cada 300ms para crear un patrón de alarma
+                alarmInterval = setInterval(() => {
+                    toneIndex = (toneIndex + 1) % tones.length;
+                    createTone(tones[toneIndex]);
+                }, 300);
+                
+                // También intentar reproducir el audio de respaldo en bucle
+                try {
+                    winSound.currentTime = 0;
+                    winSound.loop = true;
+                    winSound.play();
+                } catch (error) {
+                    console.log("Error con el audio de respaldo:", error);
+                }
+            }
+            
+            // Función para detener el sonido
+            function stopWinSound() {
+                // Detener el intervalo
+                if (alarmInterval !== null) {
+                    clearInterval(alarmInterval);
+                    alarmInterval = null;
+                }
+                
+                // Detener el oscilador
+                if (oscillator !== null) {
+                    oscillator.stop();
+                    oscillator = null;
+                }
+                
+                // Detener el audio de respaldo
+                try {
+                    winSound.pause();
+                    winSound.currentTime = 0;
+                    winSound.loop = false;
+                } catch (error) {
+                    console.log("Error al detener audio de respaldo:", error);
+                }
+            }
+            
+            // Event listeners para botones
+            newCardBtn.addEventListener('click', createNewCard);
+            
+            resetBtn.addEventListener('click', function() {
+                // Detener el sonido si está sonando
+                stopWinSound();
+                
+                const cells = document.querySelectorAll('.bingo-cell');
+                cells.forEach(cell => cell.classList.remove('marked'));
+                winnerMessage.style.display = 'none';
+            });
+            
+            // Crear tarjeta al cargar la página
+            createNewCard();
+        });
+    </script>
+</body>
+</html>
